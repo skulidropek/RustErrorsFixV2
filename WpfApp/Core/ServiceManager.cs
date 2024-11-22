@@ -32,9 +32,9 @@ namespace WpfApp.Core
             services.AddSingleton<ConfigurationService>();
             services.AddSingleton<FileConfigurationService>();
             services.AddSingleton<IAnalyzeConfigurationService, AnalyzeConfigurationServiceLastDevBlog>();
-            services.AddSingleton<IAnalyzeConfigurationService, AnalyzeConfigurationService236DevBlog>();
+            //services.AddSingleton<IAnalyzeConfigurationService, AnalyzeConfigurationService236DevBlog>();
             services.AddScoped<RegistryService>();
-            services.AddScoped<IDiagnosticsAnalyzerConfigurationService, DiagnosticsAnalyzerConfigurationService236Dev>();
+            //services.AddSingleton<IDiagnosticsAnalyzerConfigurationService, DiagnosticsAnalyzerConfigurationServiceLastDevBlog>();
             services.PostConfigure<ManagedSection>(s=>
             {
                 //var overrideSection = new ManagedSectionOverride();

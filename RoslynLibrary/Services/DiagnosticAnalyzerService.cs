@@ -15,10 +15,10 @@ namespace RoslynLibrary.Services
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DiagnosticAnalyzerService : DiagnosticAnalyzer
     {
-        private readonly IDiagnosticsAnalyzerConfigurationService _diagnosticsAnalyzerConfigurationService;
-        private Dictionary<string ,DiagnosticDescriptor> _supportedDiagnostics = new Dictionary<string, DiagnosticDescriptor>();
+        private Dictionary<string, DiagnosticDescriptor> _supportedDiagnostics = new Dictionary<string, DiagnosticDescriptor>();
+        private IDiagnosticsAnalyzerConfigurationService _diagnosticsAnalyzerConfigurationService;
 
-        public DiagnosticAnalyzerService(IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
+        public void Set(IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
         {
             _diagnosticsAnalyzerConfigurationService = diagnosticsAnalyzerConfigurationService;
             _supportedDiagnostics = diagnosticsAnalyzerConfigurationService.AnalyzeBaseOverrideModels.ToDictionary(s => s.RegexPattern, s => new DiagnosticDescriptor(s.DiagnosticId, s.Title, s.MessageFormat, s.Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: s.Description));

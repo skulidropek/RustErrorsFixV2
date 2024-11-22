@@ -69,6 +69,7 @@ namespace WpfApp.Core.Services
             return (analyzeConfigurationService, diagnosticsAnalyzerConfigurationService);
         }
 
+        public IEnumerable<DiagnosticsAnalyzerConfigurationService> GetDiagnosticsAnalyzerConfigurationServices() => _diagnosticsAnalyzeConfigurationServices.Values.Cast<DiagnosticsAnalyzerConfigurationService>();
         public IEnumerable<AnalyzeConfigurationService> GetAnalyzeConfigurationServices() => _analyzeConfigurationServices.Values.Cast<AnalyzeConfigurationService>();
     }
 }

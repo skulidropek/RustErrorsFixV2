@@ -92,7 +92,7 @@ namespace WpfApp.ViewModel
 
             _syntaxTree = CSharpSyntaxTree.ParseText(plugin);
 
-            var errors = _pluginDiagnosticsAnalyzerService.AnalyzeCompilationAsync(_syntaxTree).GetAwaiter().GetResult();
+            var errors = _pluginDiagnosticsAnalyzerService.AnalyzeCompilationAsync(_syntaxTree, _configurationService.DiagnosticsAnalyzerConfiguration).GetAwaiter().GetResult();
 
             Errors = new ObservableCollection<string>(errors.Select(s => $"[{s.Line}:{s.Symbol}] " + s.Text));
 
@@ -121,11 +121,11 @@ namespace WpfApp.ViewModel
 
         public async void ChoicePluginCommandExecute(object obj)
         {
-            var plugin = (await _pluginFixService.Fix(_syntaxTree, _configurationService.AnalyzeConfiguration.AnalyzeBaseModels)).ToFullString();
+            var plugin = (await _pluginFixService.Fix(_syntaxTree, _configurationService.AnalyzeConfiguration.AnalyzeBaseModels, _configurationService.DiagnosticsAnalyzerConfiguration)).ToFullString();
 
             _syntaxTree = CSharpSyntaxTree.ParseText(plugin);
 
-            var errors = _pluginDiagnosticsAnalyzerService.AnalyzeCompilationAsync(_syntaxTree).GetAwaiter().GetResult();
+            var errors = _pluginDiagnosticsAnalyzerService.AnalyzeCompilationAsync(_syntaxTree, _configurationService.DiagnosticsAnalyzerConfiguration).GetAwaiter().GetResult();
 
             Errors = new ObservableCollection<string>(errors.Select(s => $"[{s.Line}:{s.Symbol}] " + s.Text));
 

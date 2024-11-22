@@ -7,6 +7,7 @@ using RoslynLibrary.Services;
 using System.Text.RegularExpressions;
 using RoslynLibrary.Services.Analyzer;
 using System.Text;
+using RoslynLibrary.Services.Interfaces;
 
 public class CodeErrorFixerService : CSharpSyntaxRewriter
 {
@@ -22,9 +23,9 @@ public class CodeErrorFixerService : CSharpSyntaxRewriter
         _analyzers = analyzers;
     }
 
-    public async Task<SyntaxNode> VisitAndFixErrors(SyntaxNode node, IEnumerable<AnalyzeBaseModel> analyzeBaseModels)
+    public async Task<SyntaxNode> VisitAndFixErrors(SyntaxNode node, IEnumerable<AnalyzeBaseModel> analyzeBaseModels, IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
     {
-        _compilationErrors = await _pluginDiagnosticsAnalyzer.AnalyzeCompilationAsync(node.SyntaxTree);
+        _compilationErrors = await _pluginDiagnosticsAnalyzer.AnalyzeCompilationAsync(node.SyntaxTree, diagnosticsAnalyzerConfigurationService);
 
         if (_compilationErrors.Count() == 0)
             return node;

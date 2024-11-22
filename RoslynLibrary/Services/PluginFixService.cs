@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using RoslynLibrary.Models;
+using RoslynLibrary.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,11 @@ namespace RoslynLibrary.Services
             _codeErrorFixer = codeErrorFixer;
         }
 
-        public async Task<SyntaxNode> Fix(SyntaxTree tree, IEnumerable<AnalyzeBaseModel> analyzeBaseModels)
+        public async Task<SyntaxNode> Fix(SyntaxTree tree, IEnumerable<AnalyzeBaseModel> analyzeBaseModels, IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
         {
             var obj = JsonConvert.SerializeObject(analyzeBaseModels);
             //await _pluginDiagnosticsAnalyzer.AnalyzeCompilation(tree);
-            return await _codeErrorFixer.VisitAndFixErrors(tree.GetRoot(), analyzeBaseModels);
+            return await _codeErrorFixer.VisitAndFixErrors(tree.GetRoot(), analyzeBaseModels, diagnosticsAnalyzerConfigurationService);
         }
     }
 }

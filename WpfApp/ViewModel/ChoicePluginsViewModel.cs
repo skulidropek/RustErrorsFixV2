@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using RoslynLibrary.Sections;
+using RoslynLibrary.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,10 +26,9 @@ namespace WpfApp.ViewModel
         private readonly PageService _pageService;
         private readonly ConfigurationService _configurationService;
         private readonly FileConfigurationService _fileConfigurationService;
-
         //private bool _roslynReferenseHave => !string.IsNullOrEmpty(_managedSection.Path);
 
-      //  public string RoslynButtonText => _roslynReferenseHave ? _langService.GetLang("Select") : _langService.GetLang("SelectFolderManaged");
+        //  public string RoslynButtonText => _roslynReferenseHave ? _langService.GetLang("Select") : _langService.GetLang("SelectFolderManaged");
 
         public string SelectPluginText => _langService.GetLang("SelectPlugin");
 
@@ -43,7 +43,6 @@ namespace WpfApp.ViewModel
             _pageService = ServiceManager.ServiceProvider.GetRequiredService<PageService>();
             _langService = ServiceManager.ServiceProvider.GetRequiredService<LangService>();
             _configurationService = ServiceManager.ServiceProvider.GetRequiredService<ConfigurationService>();
-
             _fileConfigurationService = ServiceManager.ServiceProvider.GetRequiredService<FileConfigurationService>();
 
             var registryService = ServiceManager.ServiceProvider.GetRequiredService<RegistryService>();
@@ -134,6 +133,8 @@ namespace WpfApp.ViewModel
 
             var configurationService = ServiceManager.ServiceProvider.GetRequiredService<ConfigurationService>();
             configurationService.AnalyzeConfiguration = button.AnalyzeConfigurationService;
+            configurationService.DiagnosticsAnalyzerConfiguration = new DiagnosticsAnalyzerConfigurationServiceLastDevBlog(_fileConfigurationService.Get(button.AnalyzeConfigurationService.ConfigurationName).Value.Item2);
+            //configurationService.DiagnosticsAnalyzerConfiguration = _diagnosticsAnalyzerConfigurationService;//
             _pageService.OpenRoslyn();
         }
 

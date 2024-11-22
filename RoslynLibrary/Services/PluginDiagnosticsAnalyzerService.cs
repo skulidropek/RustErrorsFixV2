@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RoslynLibrary.Models;
 using RoslynLibrary.Sections;
+using RoslynLibrary.Services.Interfaces;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -22,17 +23,18 @@ namespace RoslynLibrary.Services
         public PluginDiagnosticsAnalyzerService(IOptions<ManagedSection> managedSection, DiagnosticAnalyzerService diagnosticAnalyzerService)
         {
             _managedSection = managedSection.Value;
-            _diagnosticAnalyzerService =diagnosticAnalyzerService;
+            _diagnosticAnalyzerService = diagnosticAnalyzerService;
         }
 
-        public async Task<List<CompilationErrorModel>> AnalyzeCompilationAsync(string plugin)
+        public async Task<List<CompilationErrorModel>> AnalyzeCompilationAsync(string plugin, IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
         {
             var tree = CSharpSyntaxTree.ParseText(plugin);
-            return await AnalyzeCompilationAsync(tree);
+            return await AnalyzeCompilationAsync(tree, diagnosticsAnalyzerConfigurationService);
         }
 
-        public async Task<List<CompilationErrorModel>> AnalyzeCompilationAsync(SyntaxTree syntaxTree)
+        public async Task<List<CompilationErrorModel>> AnalyzeCompilationAsync(SyntaxTree syntaxTree, IDiagnosticsAnalyzerConfigurationService diagnosticsAnalyzerConfigurationService)
         {
+            _diagnosticAnalyzerService.Set(diagnosticsAnalyzerConfigurationService);
             var errors = new List<CompilationErrorModel>();
 
             foreach (var diagnostic in await GetAnalysisResultsAsync(CreateAnalyzer(syntaxTree, "Plugin", _managedSection.Path)))
