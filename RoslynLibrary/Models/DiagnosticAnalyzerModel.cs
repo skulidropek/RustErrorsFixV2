@@ -17,5 +17,7 @@ namespace RoslynLibrary.Models
         public string Description { get; set; }
         public string Category { get; set; }
         public string RegexPattern { get; set; }
+
+        public KeyValuePair<string, string> AnalyzeSource { get; set; }
     }
 }

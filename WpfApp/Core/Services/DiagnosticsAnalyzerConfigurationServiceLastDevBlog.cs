@@ -36,6 +36,7 @@ namespace WpfApp.Core.Services
 
                     return new DiagnosticAnalyzerModel()
                     {
+                        AnalyzeSource = s,
                         DiagnosticId = $"{hookName}Error",
                         Description = $"The code should not contain '{hookName}'",
                         Category = "Syntax",

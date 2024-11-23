@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using RoslynLibrary.Sections;
 using RoslynLibrary.Services.Interfaces;
 using System;
@@ -16,6 +17,7 @@ using System.Windows.Input;
 using WpfApp.Core;
 using WpfApp.Core.Services;
 using WpfApp.Core.Services.Interfaces;
+using WpfApp.Extensions;
 using WpfApp.Models;
 
 namespace WpfApp.ViewModel
@@ -96,25 +98,18 @@ namespace WpfApp.ViewModel
 
         public void RoslynPageOpenCommandExecute(object obj)
         {
-            if(obj is not ButtonModel)
+            if (obj is not ButtonModel button)
                 return;
-
-            var button = obj as ButtonModel;
-
 
             if (button.ButtonResetVisibility == Visibility.Hidden)
             {
                 var path = GetPathOpenFolderDialog();
 
-                if(string.IsNullOrEmpty(path))
+                if (string.IsNullOrEmpty(path))
                 {
                     MessageBox.Show("Need select Managed folder");
                     return;
                 }
-
-                //var overrideSection = new ManagedSectionOverride();
-                //overrideSection.Path = path;
-                //_managedSection.Path = path;
 
                 var registryService = ServiceManager.ServiceProvider.GetRequiredService<RegistryService>();
 
@@ -133,8 +128,36 @@ namespace WpfApp.ViewModel
 
             var configurationService = ServiceManager.ServiceProvider.GetRequiredService<ConfigurationService>();
             configurationService.AnalyzeConfiguration = button.AnalyzeConfigurationService;
-            configurationService.DiagnosticsAnalyzerConfiguration = new DiagnosticsAnalyzerConfigurationServiceLastDevBlog(_fileConfigurationService.Get(button.AnalyzeConfigurationService.ConfigurationName).Value.Item2);
-            //configurationService.DiagnosticsAnalyzerConfiguration = _diagnosticsAnalyzerConfigurationService;//
+            configurationService.DiagnosticsAnalyzerConfiguration = new DiagnosticsAnalyzerConfigurationServiceLastDevBlog(
+                _fileConfigurationService.Get(button.AnalyzeConfigurationService.ConfigurationName).Value.Item2);
+
+            var diagnosticsAnalyzerAnalyzeConfiguration = configurationService.DiagnosticsAnalyzerConfiguration.AnalyzeBaseOverrideModels
+                .Select(s =>
+                {
+                    try
+                    {
+                        var (regexPattern, regexReplacement) = MethodSignatureHelper.GenerateRegexPatternAndReplacement(s.AnalyzeSource.Key, s.AnalyzeSource.Value);
+
+                        return new AnalyzeBaseOverrideModel
+                        {
+                            AnalyzeType = RoslynLibrary.Models.AnalyzeType.Method,
+                            Description = s.Description,
+                            ErrorText = Regex.Escape(s.MessageFormat),
+                            RegexPattern = regexPattern,
+                            RegexReplacement = regexReplacement,
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Skipping invalid method signature '{s.AnalyzeSource.Key}': {ex.Message}");
+                        return null;
+                    }
+                })
+                .Where(model => model != null)
+                .ToList();
+
+            configurationService.AnalyzeConfiguration.AnalyzeBaseModels.AddRange(diagnosticsAnalyzerAnalyzeConfiguration);
+
             _pageService.OpenRoslyn();
         }
 
