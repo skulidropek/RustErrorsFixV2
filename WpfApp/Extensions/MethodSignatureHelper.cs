@@ -143,9 +143,10 @@ namespace WpfApp.Extensions
                 }
                 else
                 {
+                    var paramIndex = oldParamIndex + 1;
                     // New parameter, ensure it has a name
                     var paramName = !string.IsNullOrEmpty(newParam.Name) ? newParam.Name : GenerateParameterName(newParam.Type, paramCounter);
-                    paramReplacements.Add($"{newParam.Type} {paramName}");
+                    paramReplacements.Add($"{newParam.Type} {(oldMethod.Parameters.Count <= paramCounter ? paramName : $"${{Name{paramCounter}}}")}");
                 }
                 paramCounter++;
             }
